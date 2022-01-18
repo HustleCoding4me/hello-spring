@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,12 +22,6 @@ class MemberServiceIntegrationTest {
      @Autowired MemberRepository memberRepository;
     @Autowired MemberService memberService;
 
-    @BeforeEach
-    public void beforeEach() {
-        memberRepository = new MemoryMemberRepository();
-        memberService = new MemberService(memberRepository);
-    }
-
     @Test
     void 회원가입() {
         //given
@@ -37,7 +32,7 @@ class MemberServiceIntegrationTest {
         //when
         Long saveId = memberService.join(member);
         //then
-        Member findMember = memberService.findOne(saveId).get();
+        Member findMember = memberService.findOne(member.getId()).get();
         assertThat(member.getName()).isEqualTo(findMember.getName());
     }
 
@@ -45,16 +40,16 @@ class MemberServiceIntegrationTest {
     public void 중복_회원_예외() {
         //given
         Member member1 = new Member();
-        member1.setName("spring");
+        member1.setName("spring4");
 
         Member member2 = new Member();
-        member2.setName("spring");
+        member2.setName("spring4");
 
         //when
 
         memberService.join(member1);
         IllegalStateException e = assertThrows(IllegalStateException.class, () -> memberService.join(member2));
-
+        System.out.println(e.getMessage());
         assertThat(e.getMessage()).isEqualTo("이미 존재하는 회원입니다.");
         /*try {
             memberService.join(member2);
